@@ -1,0 +1,23 @@
+//ADD TO CODE
+import teachable_machine import TeachableMachine;
+
+import numpy as np
+import tensorflow as tf
+
+model = TeachableMachine(model_path="soundclassifier_with_metadata.tflite", labels_file_path="labels.txt")
+
+light_is_on = False;
+
+def detected(label):
+    global light_is_on
+    if label == "Clap": # Make sure this matches your label in labels.txt
+        light_is_on = not light_is_on
+        arduino.write(b'H' if light_is_on else b'L')
+        print("Toggled!")
+
+# Simple loop to check the model
+while True:
+    # This package usually looks at frames or audio clips
+    result = model.classify_recording() 
+    detected(result["class_name"])
+
