@@ -1,0 +1,45 @@
+const int micPin = A0;     // Microphone analog pin
+const int ledPin = 13;     // LED or relay pin
+
+int threshold = 100;       // Adjust based on your mic sensitivity
+int baseline = 0;
+
+bool lightState = false;   // OFF initially
+
+unsigned long lastClapTime = 0;
+unsigned long debounceDelay = 300; // milliseconds (prevents double-trigger)
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+
+  // Get baseline reading (average of a few samples)
+  int sum = 0;
+  for (int i = 0; i < 50; i++) {
+    sum += analogRead(micPin);
+    delay(5);
+  }
+  baseline = sum / 50;
+
+  Serial.print("Baseline: ");
+  Serial.println(baseline);
+}
+
+void loop() {
+  int micValue = analogRead(micPin);
+  int diff = abs(micValue - baseline);
+
+  // Check for clap (spike above threshold)
+  if (diff > threshold) {
+    unsigned long currentTime = millis();
+
+    // Debounce: ignore rapid repeated triggers
+    if (currentTime - lastClapTime > debounceDelay) {
+      lightState = !lightState; // Toggle light
+      digitalWrite(ledPin, lightState ? HIGH : LOW);
+
+      Serial.println("Clap detected! Toggling light.");
+      lastClapTime = currentTime;
+    }
+  }
+}
