@@ -16,6 +16,7 @@ Collaborators
 AI Portion:
 
 Ryan King -- trained the Google Teachable Machine model to detect claps and generated the .tflite file
+
 Rafe Burton
 
 Circuit / Arduino:
